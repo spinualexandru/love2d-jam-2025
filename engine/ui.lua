@@ -8,11 +8,12 @@ local function isMouseOver(x, y, width, height)
 end
 
 function ui.button(text, x, y, width, height, font_size, font_color, bg_color, hover_color)
-    font = love.graphics.newFont("assets/DepartureMono-Regular.otf", 20)
+
     if not font_size then
         font_size = 12
-    end
 
+    end
+    font = love.graphics.newFont("assets/DepartureMono-Regular.otf", font_size)
     if not font_color then
         font_color = colors.text
     end
@@ -26,6 +27,7 @@ function ui.button(text, x, y, width, height, font_size, font_color, bg_color, h
     end
 
     love.graphics.setFont(font)
+
 
     -- Calculate the width of the text
     local text_width = font:getWidth(text)
@@ -41,8 +43,8 @@ function ui.button(text, x, y, width, height, font_size, font_color, bg_color, h
     else
         love.graphics.setColor(bg_color)
     end
-
-    love.graphics.rectangle("fill", x, y, width, height + 8, 10, 10, 25)
+    love.graphics.setDefaultFilter("nearest", "nearest")
+    love.graphics.rectangle("fill", x, y, width, height + 8, 10, 10, 30)
 
     love.graphics.setColor(font_color)
 

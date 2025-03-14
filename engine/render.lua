@@ -12,7 +12,7 @@ function render.print(text, x, y, font_size, font_color, font)
 
     love.graphics.setColor(font_color)
     if font then
-        love.graphics.setFont(font, font_size)
+        love.graphics.setFont(love.graphics.newFont(font, font_size))
     else
         love.graphics.setFont(love.graphics.newFont(font_size))
     end
