@@ -45,3 +45,5 @@ luac.out
 /.luarocks
 lua
 luarocks
+/luamodules/bin/json2lua
+/luamodules/bin/lua2json

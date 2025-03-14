@@ -2,7 +2,14 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.luarocks" />
+      <excludeFolder url="file://$MODULE_DIR$/lua-cjson/lib/luarocks" />
+      <excludeFolder url="file://$MODULE_DIR$/lua_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/luamodules/lib/lua" />
+      <excludeFolder url="file://$MODULE_DIR$/luamodules/lib/luarocks" />
+      <excludeFolder url="file://$MODULE_DIR$/luamodules/share/lua" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
