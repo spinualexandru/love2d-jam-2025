@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0",
+  "name": "The Stock Market Strategist",
+  "author": {
+    "full_name": "Alexandru Spinu",
+    "email": "spinualexandru@outlook.com",
+    "nickname": "zythina"
+  },
+  "description": "A simple stock market strategy game",
+  "keywords": [
+    "stock",
+    "market",
+    "strategy",
+    "game"
+  ],
+  "license": "MIT",
+  "nickname": "stock-market-strategist"
+}

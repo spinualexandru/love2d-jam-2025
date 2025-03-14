@@ -1,0 +1,19 @@
+{
+  "watch": [
+    "main.lua",
+    "globals.lua",
+    "conf.lua",
+    "engine",
+    "assets"
+  ],
+  "quiet": true,
+  "ext": "lua",
+  "exec": "DEV_MODE=true love .",
+  "ignore": [
+    ".idea",
+    "LICENSE",
+    "README.md",
+    "lua_modules",
+    ".git"
+  ]
+}

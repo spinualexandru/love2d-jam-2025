@@ -1,0 +1,23 @@
+{
+  "display": {
+    "resolution": {
+      "width": 800,
+      "height": 600
+    },
+    "fullscreen": false,
+    "vsync": false,
+    "fps_cap": 60,
+    "fps_counter": true,
+    "msaa": 8,
+    "borderless": false
+  },
+  "audio": {
+    "master_volume": 1.0,
+    "music_volume": 1.0,
+    "sfx_volume": 1.0
+  },
+  "gameplay": {
+    "speed": 1.0,
+    "language": "en"
+  }
+}
