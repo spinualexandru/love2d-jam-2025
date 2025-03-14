@@ -1,8 +1,12 @@
 local colors = require('engine.colors')
 local ui_interfaces = require('ui.entry')
 local graphics = require('engine.graphics')
+local events = require('events')
 
-local ui = {}
+local ui = {
+    current_interface = nil,
+    current_item = nil
+}
 
 local function isMouseOver(x, y, width, height)
     local mouseX, mouseY = love.mouse.getPosition()
@@ -31,6 +35,7 @@ function ui.button(item, x, y, color, action)
     end
 
     love.graphics.setColor(textColor)
+
     love.graphics.rectangle("fill", x, y + 12, width + string.len(item.name) * 14, text_size - 5, 0)
     love.graphics.rectangle("fill", x, y + 22, width + string.len(item.name) * 10, text_size - 0, 0)
     love.graphics.rectangle("fill", x, y + 6, width + string.len(item.name) * 12, text_size - 5, 0)
@@ -38,12 +43,19 @@ function ui.button(item, x, y, color, action)
     love.graphics.print(text, x + 10, y + 10)
 end
 
-function ui.drawInterface(name)
-    local interface = ui_interfaces.interfaces[name]
+function ui.drawInterface()
+    local interface = ui.current_interface or ui_interfaces.interfaces.main_menu
     for i, item in ipairs(interface.items) do
         if item.type == "button" then
             ui.button(item, 10, (graphics.getScreenHeight() / 7) + i * 55, colors.hexToRgb("#FCD6A6"), function()
-                print("Start")
+                if (item.opens) then
+                    ui.current_interface = ui_interfaces.interfaces[item.opens]
+                    ui.current_item = ui.current_interface.default_item
+                end
+
+                if (item.action) then
+                    events.emit(item.action)
+                end
             end)
         end
     end

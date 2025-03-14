@@ -29,6 +29,13 @@ end
 
 function hotreload.update(dt)
     if love.keyboard.isDown("r") and isDevMode() then
+        reloadModule("engine.colors")
+        reloadModule("engine.graphics")
+        reloadModule("engine.colors")
+        reloadModule("engine.render")
+        reloadModule("engine.ui")
+        reloadModule("globals")
+        reloadModule("events")
         reloadModule("main")
     end
 end
@@ -37,7 +44,8 @@ function hotreload.draw()
     screenHeight = love.graphics.getHeight()
     if isDevMode() then
         love.graphics.draw(hotreload_icon, 10, screenHeight - hotreload_icon:getHeight() - 10) -- Adjust the y-coordinate for the image
-        render.print("Dev Mode, Press 'r' to reload", 10 + hotreload_icon:getWidth() + 10, screenHeight - hotreload_icon:getHeight() - 5, 12, { 0, 0, 0 })
+        render.print("Dev Mode, Press 'r' to reload", 10 + hotreload_icon:getWidth() + 10,
+            screenHeight - hotreload_icon:getHeight() - 5, 12, { 0, 0, 0 })
     end
 end
 

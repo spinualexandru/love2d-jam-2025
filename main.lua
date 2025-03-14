@@ -7,18 +7,20 @@ local settings = require('engine.settings')
 local colors = require('engine.colors')
 local render = require('engine.render')
 local ui = require('engine.ui')
-
+local events = require('events')
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
-
-    hotreload.load()
     font = love.graphics.newFont("assets/DepartureMono-Regular.otf", 42)
-    settings.loadSettings()
+    hotreload.load()
+    settings.load()
+    events.load()
+    ui.load()
 end
 
 function love.update(dt)
     hotreload.update(dt)
+    events.update(dt)
 end
 
 function love.draw()
@@ -28,8 +30,6 @@ function love.draw()
     love.graphics.setColor(colors.text)
     render.print("The Stock Market Strategist", 10, 10, 32, colors.hexToRgb("#221D1E"),
         "assets/DepartureMono-Regular.otf")
-
-    ui.drawInterface("main_menu")
-
+    ui.drawInterface()
     hotreload.draw()
 end

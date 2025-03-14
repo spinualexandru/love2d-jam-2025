@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Debug" type="lua.app" factoryName="Lua Application">
+  <configuration default="false" name="Dev" type="lua.app" factoryName="Lua Application">
     <module name="love2d-jam" />
     <option name="program" value="/usr/bin/love" />
     <option name="file" value="" />

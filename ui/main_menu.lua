@@ -33,6 +33,10 @@ local main_menu = {
             id = "exit",
             name = "Exit",
             action = "exit",
+            action_handler = function()
+                print("HA")
+                love.event.quit()
+            end,
             type = "button"
         }
     }

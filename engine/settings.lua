@@ -2,7 +2,7 @@ local json = require('libs.json4lua')
 
 local conf = {}
 
-function conf.loadSettings()
+function conf.load()
     encoded_json = love.filesystem.read("settings.json")
     settings = json.decode(encoded_json)
     love.window.setMode(settings.display.resolution.width, settings.display.resolution.height, {
