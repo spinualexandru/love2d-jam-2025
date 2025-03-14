@@ -8,6 +8,7 @@ local colors = require('engine.colors')
 local render = require('engine.render')
 local ui = require('engine.ui')
 
+
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
 
@@ -21,11 +22,14 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.clear({ 0.1647, 0.2431, 0.2392 })
-    hotreload.draw()
+    --{ 0.1647, 0.2431, 0.2392 }
+    love.graphics.clear(colors.hexToRgb("#FBEED5"))
+
     love.graphics.setColor(colors.text)
-    render.print("The Stock Market Strategist", 10, 10, 18, colors.hexToRgb("#FCD6A6"), "assets/DepartureMono-Regular.otf")
-    local options = { "Option 1", "Option 2", "Option 3" }
-    ui.dropdown("dropdown1", "Select an option", 10, 120, 150, 30, options, 16, { 1, 1, 1 }, colors.blue, colors.lavender, 30)
-    ui.button("Click me", 10, 50, 100, 38, 22, colors.mantle, colors.blue, colors.lavender)
+    render.print("The Stock Market Strategist", 10, 10, 32, colors.hexToRgb("#221D1E"),
+        "assets/DepartureMono-Regular.otf")
+
+    ui.drawInterface("main_menu")
+
+    hotreload.draw()
 end

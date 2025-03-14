@@ -1,4 +1,6 @@
 local colors = require('engine.colors')
+local ui_interfaces = require('ui.entry')
+local graphics = require('engine.graphics')
 
 local ui = {}
 
@@ -7,100 +9,42 @@ local function isMouseOver(x, y, width, height)
     return mouseX >= x and mouseX <= x + width and mouseY >= y and mouseY <= y + height
 end
 
-function ui.button(text, x, y, width, height, font_size, font_color, bg_color, hover_color)
-
-    if not font_size then
-        font_size = 12
-
-    end
-    font = love.graphics.newFont("assets/DepartureMono-Regular.otf", font_size)
-    if not font_color then
-        font_color = colors.text
-    end
-
-    if not bg_color then
-        bg_color = colors.base
-    end
-
-    if not hover_color then
-        hover_color = colors.overlay1
-    end
-
-    love.graphics.setFont(font)
-
-
-    -- Calculate the width of the text
-    local text_width = font:getWidth(text)
-    -- Set the button width based on the text width plus padding
-    width = text_width + 40
-
-    -- Change the background color if the mouse is over the button
-    if isMouseOver(x, y, width, height) then
-        love.graphics.setColor(hover_color)
-        if (love.mouse.isDown(1)) then
-            love.graphics.setColor(colors.overlay2)
-        end
-    else
-        love.graphics.setColor(bg_color)
-    end
-    love.graphics.setDefaultFilter("nearest", "nearest")
-    love.graphics.rectangle("fill", x, y, width, height + 8, 10, 10, 30)
-
-    love.graphics.setColor(font_color)
-
-    -- Calculate the position to center the text
-    local text_x = x + (width - text_width) / 2
-    local text_y = y + (height - font:getHeight() + 8) / 2
-
-    love.graphics.print(text, text_x, text_y)
+function ui.load()
+    ui.current_interface = ui_interfaces.interfaces.main_menu
+    ui.current_item = ui.current_interface.default_item
 end
 
-local dropdowns = {}
+function ui.button(item, x, y, color, action)
+    local width = string.len(item.name) * 24
+    local text_size = 24
+    local height = text_size + 10
+    local text = item.name
+    local textColor = colors.text
 
-function ui.dropdown(id, text, x, y, width, height, options, font_size, font_color, bg_color, hover_color, option_height)
-    if not dropdowns[id] then
-        dropdowns[id] = { open = false, selected = nil, x = x, y = y, width = width, height = height }
+    love.graphics.setFont(love.graphics.newFont("assets/DepartureMono-Regular.otf", text_size))
+    if isMouseOver(x, y, width + string.len(item.name) * 10, height) then
+        color = colors.hexToRgb("#FCD6A6")
+        textColor = colors.hexToRgb("#0D0D0D")
+        if love.mouse.isDown(1) then
+            action()
+        end
     end
 
-    local dropdown = dropdowns[id]
+    love.graphics.setColor(textColor)
+    love.graphics.rectangle("fill", x, y + 12, width + string.len(item.name) * 14, text_size - 5, 0)
+    love.graphics.rectangle("fill", x, y + 22, width + string.len(item.name) * 10, text_size - 0, 0)
+    love.graphics.rectangle("fill", x, y + 6, width + string.len(item.name) * 12, text_size - 5, 0)
+    love.graphics.setColor(color)
+    love.graphics.print(text, x + 10, y + 10)
+end
 
-    -- Draw the dropdown button
-    ui.button(text, x, y, width + 1.4 + string.len(text), height, font_size, font_color, bg_color, hover_color)
-
-    -- Toggle dropdown open/close on click
-    if dropdown.clicked then
-        dropdown.open = not dropdown.open
-        dropdown.clicked = false
-    end
-
-    -- Draw the options if the dropdown is open
-    if dropdown.open then
-        for i, option in ipairs(options) do
-            local option_y = y + height + font_size + 50 * (i - 1)
-            ui.dropdownOption(option, x, option_y, width, option_height, font_size, font_color, bg_color, hover_color, function()
-                dropdown.selected = option
-                dropdown.open = false
+function ui.drawInterface(name)
+    local interface = ui_interfaces.interfaces[name]
+    for i, item in ipairs(interface.items) do
+        if item.type == "button" then
+            ui.button(item, 10, (graphics.getScreenHeight() / 7) + i * 55, colors.hexToRgb("#FCD6A6"), function()
+                print("Start")
             end)
-        end
-    end
-end
-
-function ui.dropdownOption(text, x, y, width, height, font_size, font_color, bg_color, hover_color, onClick)
-    -- Draw the option
-    ui.button(text, x, y, width + 1.4 + string.len(text), height, font_size, font_color, bg_color, hover_color)
-
-    -- Handle option click
-    if isMouseOver(x, y, width, height) and love.mouse.isDown(1) then
-        onClick()
-    end
-end
-
-function love.mousepressed(x, y, button, istouch, presses)
-    if button == 1 then
-        for id, dropdown in pairs(dropdowns) do
-            if isMouseOver(dropdown.x, dropdown.y, dropdown.width + 100, dropdown.height) then
-                dropdown.clicked = true
-            end
         end
     end
 end
