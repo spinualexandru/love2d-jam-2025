@@ -1,7 +1,7 @@
 local render = {}
 local colors = require('engine.colors')
 
-function render.print(text, x, y, font_size, font_color)
+function render.print(text, x, y, font_size, font_color, font)
     if not font_size then
         font_size = 12
     end
@@ -11,7 +11,12 @@ function render.print(text, x, y, font_size, font_color)
     end
 
     love.graphics.setColor(font_color)
-    love.graphics.setFont(love.graphics.newFont(font_size))
+    if font then
+        love.graphics.setFont(font, font_size)
+    else
+        love.graphics.setFont(love.graphics.newFont(font_size))
+    end
+
     love.graphics.print(text, x, y)
 end
 

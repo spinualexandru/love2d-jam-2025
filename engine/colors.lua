@@ -27,4 +27,10 @@ local colors = {
     crust = { 0.863, 0.878, 0.91 }
 }
 
+function colors.hexToRgb(hex)
+    hex = hex:gsub("#", "")
+    
+    return { tonumber(hex:sub(1, 2), 16) / 255, tonumber(hex:sub(3, 4), 16) / 255, tonumber(hex:sub(5, 6), 16) / 255 }
+end
+
 return colors
