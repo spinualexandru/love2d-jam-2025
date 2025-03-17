@@ -1,5 +1,8 @@
 {
   "test": true,
+  "player": {
+    "name": "Guest"
+  },
   "display": {
     "resolution": {
       "width": 1280,

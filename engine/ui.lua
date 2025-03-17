@@ -2,6 +2,7 @@ local colors = require('engine.colors')
 local ui_interfaces = require('ui.entry')
 local graphics = require('engine.graphics')
 local events = require('events')
+local settings = require('engine.settings')
 
 
 local ui = {
@@ -95,8 +96,38 @@ function ui.dropdown(item, x, y, color, action, options)
     --TODO
 end
 
-function ui.textbox(item, x, y, color, action)
-    --TODO
+function ui.textbox(item, x, y, prompt, placeholder, color, action)
+    local width = string.len(item.name) * 24
+    local text_size = 24
+    local height = text_size + 10
+    local text = settings[item.variable]
+    local textColor = colors.text
+
+    love.graphics.setFont(love.graphics.newFont("assets/DepartureMono-Regular.otf", text_size))
+    if isMouseOver(x, y, width + string.len(item.name) * 10, height) then
+        color = colors.hexToRgb("#FCD6A6")
+        textColor = colors.hexToRgb("#0D0D0D")
+        if love.mouse.isDown(1) then
+            action()
+        end
+    end
+
+    love.graphics.setColor(textColor)
+
+
+
+
+    love.graphics.rectangle("fill", x, y + 12, width + string.len(item.name) * 14, text_size - 5, 0)
+    love.graphics.rectangle("fill", x, y + 22, width + string.len(item.name) * 10, text_size - 0, 0)
+    love.graphics.rectangle("fill", x, y + 6, width + string.len(item.name) * 12, text_size - 5, 0)
+    love.graphics.setColor(colors.hexToRgb("#FFA07A"))
+
+    -- blink bar next to the text
+    if (love.timer.getTime() % 1) > 0.5 then
+        love.graphics.rectangle("fill", x + string.len(text) * 18, y + 10, 5, 30, 0)
+    end
+    love.graphics.setColor(color)
+    love.graphics.print(text, x + 10, y + 10)
 end
 
 function ui.draw()
@@ -128,6 +159,20 @@ function ui.draw()
                     events.emit(item.action)
                 end
             end)
+        end
+
+        if item.type == "textbox" then
+            ui.textbox(item, 10, (graphics.getScreenHeight() / 7) + i * 55, "Prompt", "Placeholder",
+                colors.hexToRgb("#FCD6A6"), function()
+                    if (item.opens) then
+                        ui.current_interface = ui_interfaces.interfaces[item.opens]
+                        ui.current_item = ui.current_interface.default_item
+                    end
+
+                    if (item.action) then
+                        events.emit(item.action)
+                    end
+                end)
         end
     end
 end

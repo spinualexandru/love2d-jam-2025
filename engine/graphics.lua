@@ -54,4 +54,37 @@ function graphics.shader.draw()
     love.graphics.setShader()
 end
 
+function graphics.loadSpriteSheet(fileName, width, height)
+    local image = love.graphics.newImage(fileName)
+    image:setFilter("nearest", "nearest")
+    local spriteSheet = {}
+    spriteSheet.image = image
+    spriteSheet.width = width
+    spriteSheet.height = height
+    -- scale
+
+
+    spriteSheet.quads = {}
+    for y = 0, image:getHeight() - height, height do
+        for x = 0, image:getWidth() - width, width do
+            table.insert(spriteSheet.quads, love.graphics.newQuad(x, y, width, height, image:getDimensions()))
+        end
+    end
+    return spriteSheet
+end
+
+function graphics.drawSprite(spriteSheet, index, x, y)
+    love.graphics.draw(spriteSheet.image, spriteSheet.quads[index], x, y)
+end
+
+function graphics.drawSpirteSheetAnimation(spriteSheet, animation, x, y)
+    love.graphics.draw(spriteSheet.image, spriteSheet.quads[animation.frame], x, y)
+end
+
+function graphics.drawFromTo(spriteSheet, from, to, x, y)
+    for i = from, to do
+        love.graphics.draw(spriteSheet.image, spriteSheet.quads[i], x, y, 0, 4, 4)
+    end
+end
+
 return graphics

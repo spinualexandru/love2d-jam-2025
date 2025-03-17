@@ -9,6 +9,13 @@ local options = {
             action = "fullscreen"
         },
         {
+            name = "Player name",
+            type = "textbox",
+            variable = "G_PLAYER_NAME",
+            prompt = "Enter your name",
+            placeholder = "Name"
+        },
+        {
             name = "Resolution",
             type = "dropdown",
             options = {

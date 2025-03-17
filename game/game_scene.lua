@@ -2,10 +2,16 @@ local state = require('engine.state')
 local ui = require('engine.ui')
 local render = require('engine.render')
 local colors = require('engine.colors')
+local player = require('engine.player')
 local game_scene = {}
 
 function game_scene.load()
+    player.load()
+end
 
+function game_scene.update(dt)
+    -- Add main menu-specific update code here
+    player.update(dt)
 end
 
 function game_scene.draw()
@@ -16,10 +22,7 @@ function game_scene.draw()
     ui.button({ name = "Back", action = "back" }, 10, 50, colors.hexToRgb("#FCD6A6"), function()
         state.switch("main_menu")
     end)
-end
-
-function game_scene.update(dt)
-    -- Add main menu-specific update code here
+    player.draw()
 end
 
 return game_scene

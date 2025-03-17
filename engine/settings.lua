@@ -15,6 +15,8 @@ function conf.load()
         msaa = settings.display.msaa,
         borderless = settings.display.borderless
     })
+
+    conf.G_PLAYER_NAME = settings.player.name
 end
 
 function conf.loadMetadata()
