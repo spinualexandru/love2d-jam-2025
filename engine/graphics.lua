@@ -73,17 +73,9 @@ function graphics.loadSpriteSheet(fileName, width, height)
     return spriteSheet
 end
 
-function graphics.drawSprite(spriteSheet, index, x, y)
-    love.graphics.draw(spriteSheet.image, spriteSheet.quads[index], x, y)
-end
-
-function graphics.drawSpirteSheetAnimation(spriteSheet, animation, x, y)
-    love.graphics.draw(spriteSheet.image, spriteSheet.quads[animation.frame], x, y)
-end
-
-function graphics.drawFromTo(spriteSheet, from, to, x, y)
-    for i = from, to do
-        love.graphics.draw(spriteSheet.image, spriteSheet.quads[i], x, y, 0, 4, 4)
+function graphics.drawColumn(spriteSheet, column, startRow, endRow, x, y, scale)
+    for row = startRow, endRow do
+        love.graphics.draw(spriteSheet.image, spriteSheet.quads[column + row], x, y, 0, scale, scale)
     end
 end
 
