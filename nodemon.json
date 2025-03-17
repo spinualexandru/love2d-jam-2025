@@ -4,7 +4,10 @@
     "globals.lua",
     "conf.lua",
     "engine",
-    "assets"
+    "assets",
+    "scenes",
+    "ui",
+    "game"
   ],
   "quiet": true,
   "ext": "lua",
