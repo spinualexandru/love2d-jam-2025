@@ -5,7 +5,8 @@ local options = {
         {
             name = "Fullscreen",
             type = "checkbox",
-            variable = "fullscreen"
+            variable = "fullscreen",
+            action = "fullscreen"
         },
         {
             name = "Resolution",

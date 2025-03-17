@@ -1,5 +1,5 @@
 local ui_interfaces = require('ui.entry')
-
+local conf = require('engine.settings')
 local events = {}
 events.handlers = {}
 
@@ -31,7 +31,10 @@ function events.update(dt)
 end
 
 function events.load()
-    events.on("exit", ui_interfaces.interfaces.main_menu.items[5].action_handler)
+    events.on("exit", ui_interfaces.getActionHandler(ui_interfaces.interfaces.main_menu, "exit"))
+    events.on("continue", function() print("Continue") end)
+    events.on("start", ui_interfaces.getActionHandler(ui_interfaces.interfaces.main_menu, "start"))
+    events.on("load_game", function() print("Load Game") end)
 end
 
 return events

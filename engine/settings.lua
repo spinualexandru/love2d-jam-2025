@@ -17,4 +17,18 @@ function conf.load()
     })
 end
 
+function conf.loadMetadata()
+    local encoded_metadata = love.filesystem.read("metadata.json")
+    G_METADATA = json.decode(encoded_metadata)
+end
+
+function conf.change_setting(setting, value)
+    local unparsed_json = love.filesystem.read("settings.json")
+    local parsed_settings = json.decode(unparsed_json)
+    print(parsed_settings)
+    parsed_settings[setting] = value
+    local new_settings = json.encode(parsed_settings)
+    love.filesystem.write("settings.json", new_settings)
+end
+
 return conf

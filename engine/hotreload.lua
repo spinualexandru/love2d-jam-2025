@@ -36,16 +36,19 @@ function hotreload.update(dt)
         reloadModule("engine.ui")
         reloadModule("globals")
         reloadModule("events")
+        reloadModule("ui.main_menu")
+        reloadModule("ui.options")
+        reloadModule("ui.entry")
         reloadModule("main")
     end
 end
 
 function hotreload.draw()
-    screenHeight = love.graphics.getHeight()
+    G_ScreenHeight = love.graphics.getHeight()
     if isDevMode() then
-        love.graphics.draw(hotreload_icon, 10, screenHeight - hotreload_icon:getHeight() - 10) -- Adjust the y-coordinate for the image
+        love.graphics.draw(hotreload_icon, 10, G_ScreenHeight - hotreload_icon:getHeight() - 10) -- Adjust the y-coordinate for the image
         render.print("Dev Mode, Press 'r' to reload", 10 + hotreload_icon:getWidth() + 10,
-            screenHeight - hotreload_icon:getHeight() - 5, 12, { 0, 0, 0 })
+            G_ScreenHeight - hotreload_icon:getHeight() - 5, 12, { 0, 0, 0 })
     end
 end
 

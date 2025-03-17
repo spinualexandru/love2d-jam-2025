@@ -3,6 +3,7 @@ local ui_interfaces = require('ui.entry')
 local graphics = require('engine.graphics')
 local events = require('events')
 
+
 local ui = {
     current_interface = nil,
     current_item = nil
@@ -70,7 +71,7 @@ function ui.checkbox(item, x, y, color, action)
 
     if isChecked then
         love.graphics.setColor(colors.hexToRgb("#0D0D0D"))
-        love.graphics.rectangle("fill", x + 2, y + 6, 38, 38, 0)
+        love.graphics.rectangle("fill", x + 6.5, y + 9.5, 30, 30, 0)
     end
 
     local buttonSpacing = 50
@@ -86,14 +87,28 @@ function ui.checkbox(item, x, y, color, action)
     end
 end
 
-function ui.drawInterface()
+function ui.slider(item, x, y, color, action, min, max, value)
+    --TODO
+end
+
+function ui.dropdown(item, x, y, color, action, options)
+    --TODO
+end
+
+function ui.textbox(item, x, y, color, action)
+    --TODO
+end
+
+function ui.draw()
     local interface = ui.current_interface or ui_interfaces.interfaces.main_menu
     for i, item in ipairs(interface.items) do
         if item.type == "button" then
             ui.button(item, 10, (graphics.getScreenHeight() / 7) + i * 55, colors.hexToRgb("#FCD6A6"), function()
                 if (item.opens) then
-                    ui.current_interface = ui_interfaces.interfaces[item.opens]
-                    ui.current_item = ui.current_interface.default_item
+                    if ui_interfaces.interfaces[item.opens] then
+                        ui.current_interface = ui_interfaces.interfaces[item.opens]
+                        ui.current_item = ui.current_interface.default_item
+                    end
                 end
 
                 if (item.action) then
