@@ -3,10 +3,11 @@ local state = {}
 local currentState
 local states = {}
 
-function state.register(name, drawFunction, updateFunction)
+function state.register(name, drawFunction, updateFunction, loadFunction)
     states[name] = {
         draw = drawFunction,
-        update = updateFunction
+        update = updateFunction,
+        load = loadFunction
     }
 end
 
@@ -23,6 +24,14 @@ end
 function state.draw()
     if currentState and states[currentState] and states[currentState].draw then
         states[currentState].draw()
+    end
+end
+
+function state.load()
+    for name, state in pairs(states) do
+        if state.load then
+            state.load()
+        end
     end
 end
 
