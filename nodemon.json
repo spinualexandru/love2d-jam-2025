@@ -7,7 +7,8 @@
     "assets",
     "scenes",
     "ui",
-    "game"
+    "game",
+    "crt_shader.glsl"
   ],
   "quiet": true,
   "ext": "lua",

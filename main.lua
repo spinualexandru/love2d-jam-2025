@@ -1,14 +1,10 @@
 local hotreload = require("engine.hotreload")
 local settings = require('engine.settings')
-local colors = require('engine.colors')
-local render = require('engine.render')
 local ui = require('engine.ui')
 local events = require('events')
 local state = require('engine.state')
 local graphics = require('engine.graphics')
 local scenes = require('game.scenes')
-
-
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
@@ -42,6 +38,6 @@ end
 
 love.keypressed = function(key)
     if key == "escape" then
-        state.switch("mainMenu")
+        state.switch("main_menu")
     end
 end
