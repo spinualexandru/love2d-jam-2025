@@ -7,7 +7,7 @@ local player = {
     width = 32,
     height = 32,
     speed = 100,
-    image = graphics.loadSpriteSheet("assets/player.png", 16, 24),
+    image = nil,
     isJumping = false,
     velocityY = 0,  -- Vertical velocity
     gravity = 1000, -- Gravity strength
@@ -24,17 +24,17 @@ end
 function player.update(dt)
     -- Horizontal movement
     if love.keyboard.isDown("left") or love.keyboard.isDown("a") then
-        if player.x > 0 then
+        if player.x > 32 then
             player.x = player.x - player.speed * dt
         else
-            player.x = 0
+            player.x = 32
         end
     end
     if love.keyboard.isDown("right") or love.keyboard.isDown("d") then
-        if player.x < graphics.getScreenWidth() - player.width then
+        if player.x < graphics.getScreenWidth() - 16 - player.width then
             player.x = player.x + player.speed * dt
         else
-            player.x = graphics.getScreenWidth() - player.width
+            player.x = graphics.getScreenWidth() - 16 - player.width
         end
     end
 
@@ -57,8 +57,8 @@ function player.update(dt)
         player.velocityY = player.velocityY + player.gravity * dt
         player.y = player.y + player.velocityY * dt
 
-        if player.y >= graphics.getScreenHeight() - player.height then
-            player.y = graphics.getScreenHeight() - player.height
+        if player.y >= graphics.getScreenHeight() - 16 - player.height then
+            player.y = graphics.getScreenHeight() - 16 - player.height
             player.isJumping = false
             player.velocityY = 0
             if player.fallSound then
