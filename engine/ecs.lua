@@ -34,6 +34,23 @@ function ecs.cloneEntity(entity)
     table.insert(ecs.entities, newEntity)
 end
 
+function ecs.removeEntity(entity)
+    for i, e in ipairs(ecs.entities) do
+        if e.id == entity.id then
+            table.remove(ecs.entities, i)
+            break
+        end
+    end
+end
+
+function ecs.removeAllEntitiesOfType(type)
+    for i = #ecs.entities, 1, -1 do
+        if ecs.entities[i].type == type then
+            table.remove(ecs.entities, i)
+        end
+    end
+end
+
 -- Components
 
 function ecs.createComponent(name, data)
@@ -254,6 +271,9 @@ function ecs.drawSystemsForAllEntities()
         for _, system in ipairs(systems) do
             if system.type == "render" then
                 system.callback(entity)
+
+                -- Restore the previous color
+                love.graphics.setColor({ 1, 1, 1 })
             end
         end
     end
@@ -264,8 +284,12 @@ function ecs.updateSystemsForAllEntities(dt)
         local systems = ecs.getSystemsByEntity(entity)
 
         for _, system in ipairs(systems) do
-            if system.type == "update" then -- Ensure only render systems are executed
-                system.callback(entity)
+            if system.type == "update" then
+                if (entity) then
+                    system.callback(dt, entity) -- Pass both dt and entity
+                else
+                    system.callback(dt)         -- Pass both dt and entity
+                end
             end
         end
     end

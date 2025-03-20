@@ -1,6 +1,7 @@
 local ecs = require('engine.ecs')
 local debug = require('libs.debug')
-local math = require('engine.math')
+local mathPlus = require('engine.math')
+local hud = require('engine.hud')
 
 local button = {}
 local buttonImage -- Declare the button image variable
@@ -26,11 +27,20 @@ function button.create(x, y, width, height)
     local entity = ecs.createEntity("button", {
         position = { x = x, y = y },
         size = { width = width, height = height },
-        state = { pressed = false },
-        action = function()
-            print("Button pressed at:", x, y)
-        end
+        state = {
+            pressed = false,
+            action = function()
+                ecs.removeAllEntitiesOfType("announcement") -- Remove all previous announcements
+                -- print random number
+
+                print("Button pressed at:", math.random(1, 100))
+                hud.announcement("Button  pressed now " .. math.random(1, 100))
+                hud.achievement("Clicked a button")
+            end
+        },
+
     })
+
 
     -- Debug print to confirm the position
 end
@@ -52,7 +62,7 @@ ecs.createSystem("buttonRender", { "position", "size", "state" }, function(entit
 end, "render")
 
 
-ecs.createSystem("buttonInteraction", { "position", "size", "state" }, function(entity)
+ecs.createSystem("buttonInteraction", { "position", "size", "state" }, function(dt, entity)
     local player = require('game.player') -- Import the player module
     local px, py = player.getPosition()   -- Get the player's position
     local bx, by = entity.components.position.x, entity.components.position.y
@@ -67,13 +77,14 @@ ecs.createSystem("buttonInteraction", { "position", "size", "state" }, function(
     }
 
     -- Check if the player is pressing E and is in the button area
-    if love.keyboard.isDown("e") and math.aabbCollision(
+    if love.keyboard.isDown("e") and mathPlus.aabbCollision(
             playerRect.x, playerRect.y, playerRect.width, playerRect.height,
             bx, by, bw, bh
         ) then
         -- Call the button action
         if not entity.components.state.pressed then
             entity.components.state.pressed = true
+
             print("Button" .. entity.id .. " pressed")
             local action = entity.components.state.action
             if action then

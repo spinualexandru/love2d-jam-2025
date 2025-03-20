@@ -81,7 +81,7 @@ function game_scene.draw()
     -- Display the timer as seconds:milliseconds
     render.print(string.format("%02d:%03d", seconds, milliseconds), 60, 150, 32, colors.hexToRgb("#9bbc0f"),
         "assets/DepartureMono-Regular.otf")
-    ui.button({ name = "Back", action = "back" }, love.graphics.getWidth() - 220, 70, colors.hexToRgb("#9bbc0f"),
+    ui.button({ name = "End", action = "back" }, love.graphics.getWidth() - 170, 55, colors.hexToRgb("#9bbc0f"),
         function()
             startTime = 0
             elapsedTime = 0
