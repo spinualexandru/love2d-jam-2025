@@ -1,3 +1,4 @@
+local debug = require('libs.debug')
 local ecs = {
     entities = {},
     components = {},
@@ -14,10 +15,11 @@ function ecs.createEntity(type, components)
         id = #ecs.entities + 1,
         components = {}
     }
-    for _, component in ipairs(components) do
-        entity.components[component] = ecs.components[component]
+    for key, value in pairs(components) do
+        entity.components[key] = value
     end
     table.insert(ecs.entities, entity)
+    return entity
 end
 
 function ecs.cloneEntity(entity)
@@ -43,7 +45,26 @@ function ecs.getComponent(name)
 end
 
 function ecs.addComponent(entity, name, data)
-    entity.components[name] = data
+    -- check if the component already exists, if not create it the nadd
+    print("Adding component:", name, "to entity:", entity.id)
+    if ecs.components[name] == nil then
+        ecs.createComponent(name, data)
+    end
+
+    if entity.components[name] == nil then
+        entity.components[name] = data
+    else
+        print("Component already exists for entity:", entity.id, "Component:", name)
+    end
+end
+
+function ecs.clear()
+    for _, entity in ipairs(ecs.entities) do
+        for name, _ in pairs(entity.components) do
+            entity.components[name] = nil
+        end
+    end
+    ecs.entities = {}
 end
 
 function ecs.removeComponent(entity, name)
@@ -120,6 +141,31 @@ function ecs.createSystem(name, components, callback, type)
         type = type
     }
     table.insert(ecs.systems, system)
+end
+
+function ecs.attachSystemsToEntityTypes(entityTypes)
+    for _, entityType in ipairs(entityTypes) do
+        for _, system in ipairs(ecs.systems) do
+            if system.type == entityType then
+                table.insert(system.entities, entityType)
+            end
+        end
+    end
+end
+
+function ecs.ensureEntityTypesHaveSystem(entityTypes, systemName)
+    for _, entityType in ipairs(entityTypes) do
+        local hasSystem = false
+        for _, system in ipairs(ecs.systems) do
+            if system.name == systemName and system.type == entityType then
+                hasSystem = true
+                break
+            end
+        end
+        if not hasSystem then
+            ecs.createSystem(systemName, {}, function() end, entityType)
+        end
+    end
 end
 
 function ecs.getSystem(name)
@@ -204,8 +250,11 @@ end
 function ecs.drawSystemsForAllEntities()
     for _, entity in ipairs(ecs.entities) do
         local systems = ecs.getSystemsByEntity(entity)
+
         for _, system in ipairs(systems) do
-            system.callback(entity)
+            if system.type == "render" then
+                system.callback(entity)
+            end
         end
     end
 end
@@ -213,8 +262,11 @@ end
 function ecs.updateSystemsForAllEntities(dt)
     for _, entity in ipairs(ecs.entities) do
         local systems = ecs.getSystemsByEntity(entity)
+
         for _, system in ipairs(systems) do
-            system.callback(entity, dt)
+            if system.type == "update" then -- Ensure only render systems are executed
+                system.callback(entity)
+            end
         end
     end
 end
@@ -235,12 +287,6 @@ function ecs.getSystemsByEntity(entity)
     end
     return systems
 end
-
--- world
-
-
-
--- Update behaviours
 
 function ecs.update(dt)
     ecs.updateSystemsForAllEntities(dt)

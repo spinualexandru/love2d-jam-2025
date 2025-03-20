@@ -13,6 +13,9 @@ end
 
 function state.switch(newState)
     currentState = newState
+    if states[newState] and states[newState].load then
+        states[newState].load()
+    end
 end
 
 function state.update(dt)

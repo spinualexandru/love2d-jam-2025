@@ -47,3 +47,4 @@ lua
 luarocks
 /luamodules/bin/json2lua
 /luamodules/bin/lua2json
+node_modules

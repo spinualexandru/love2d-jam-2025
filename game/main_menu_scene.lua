@@ -8,9 +8,9 @@ function main_menu_scene.load()
 end
 
 function main_menu_scene.draw()
-    love.graphics.clear(colors.hexToRgb("#FBEED5"))
-    love.graphics.setColor(colors.text)
-    render.print("Main Menu", 10, 10, 32, colors.hexToRgb("#221D1E"), "assets/DepartureMono-Regular.otf")
+    love.graphics.clear(colors.hexToRgb("#0f380f"))
+    love.graphics.setColor(colors.hexToRgb("#9bbc0f"))
+    render.print("Exit Strategy", 10, 10, 32, colors.hexToRgb("#9bbc0f"), "assets/DepartureMono-Regular.otf")
     ui.draw()
 end
 

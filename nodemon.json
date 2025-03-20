@@ -8,7 +8,9 @@
     "scenes",
     "ui",
     "game",
-    "crt_shader.glsl"
+    "crt_shader.glsl",
+    "shaders",
+    "settings.json"
   ],
   "quiet": true,
   "ext": "lua",

@@ -1,136 +1,116 @@
-local state = require('engine.state')
-local ui = require('engine.ui')
-local render = require('engine.render')
-local colors = require('engine.colors')
-local player = require('engine.player')
-local graphics = require('engine.graphics')
-local ecs = require('engine.ecs')
+local state      = require('engine.state')
+local ui         = require('engine.ui')
+local render     = require('engine.render')
+local colors     = require('engine.colors')
+local graphics   = require('engine.graphics')
+local physics    = require('game.physics')
+local player     = require('game.player')
+local walls      = require('game.walls')
+local settings   = require('engine.settings')
+local button     = require('game.button')
+local ecs        = require('engine.ecs')
+local hud        = require('engine.hud')
+
 local game_scene = {}
-local startTime = 0
-
-ecs.createComponent("position", { x = 0, y = 0 })
-ecs.createComponent("sprite", { image = love.graphics.newImage("assets/block.png"), width = 32, height = 32 })
-ecs.createEntity("wall", { "position", "sprite" })
-ecs.addComponent(ecs.entities[1], "position", { x = 100, y = 100 })
-ecs.addComponent(ecs.entities[1], "sprite",
-    { image = love.graphics.newImage("assets/block.png"), width = 32, height = 32 })
-ecs.createSystem("render", { "position", "sprite" }, function(entity)
-    if (entity.type == "wall") then
-        -- draw wall cubes on all left and right sides of the screen
-        for i = 0, graphics.getScreenWidth() / 16 do
-            love.graphics.draw(entity.components.sprite.image, i * 16, 0, 0, 1, 1)
-            love.graphics.draw(entity.components.sprite.image, i * 16, graphics.getScreenHeight() - 16, 0, 1, 1)
-        end
-
-        -- draw wall cubes on all bottom and top sides of the screen
-        for i = 0, graphics.getScreenHeight() / 16 do
-            love.graphics.draw(entity.components.sprite.image, 0, i * 16, 0, 1, 1)
-            love.graphics.draw(entity.components.sprite.image, graphics.getScreenWidth() - 16, i * 16, 0, 1, 1)
-        end
-    end
-
-    if (entity.type == "player") then
-        love.graphics.draw(entity.components.sprite.image, entity.components.position.x, entity.components.position.y, 0,
-            1, 1)
-    end
-end)
-
-
--- Player
-ecs.createEntity("player", { "position", "sprite" })
-ecs.addComponent(ecs.entities[2], "position", { x = 100, y = 100 })
-ecs.addComponent(ecs.entities[2], "sprite",
-    { image = love.graphics.newImage("assets/block.png"), width = 32, height = 32 })
-
-ecs.createSystem("controllable", { "position" }, function(entity)
-    if (entity.type == "player") then
-        local dt = love.timer.getDelta()
-
-        -- Horizontal movement
-        if love.keyboard.isDown("left") or love.keyboard.isDown("a") then
-            if entity.components.position.x > 16 then
-                entity.components.position.x = entity.components.position.x - 100 * dt
-            else
-                entity.components.position.x = 16
-            end
-        end
-        if love.keyboard.isDown("right") or love.keyboard.isDown("d") then
-            if entity.components.position.x < graphics.getScreenWidth() - 16 - 32 then
-                entity.components.position.x = entity.components.position.x + 100 * dt
-            else
-                entity.components.position.x = graphics.getScreenWidth() - 16 - 32
-            end
-        end
-
-        -- Jump logic
-        if not entity.isJumping then
-            if love.keyboard.isDown("space") then
-                entity.isJumping = true
-                entity.velocityY = -300 -- Initial jump velocity
-            end
-        end
-
-        -- Apply gravity if jumping
-        if entity.isJumping then
-            entity.velocityY = (entity.velocityY or 0) + 500 * dt -- Gravity strength
-            entity.components.position.y = entity.components.position.y + entity.velocityY * dt
-
-            -- Check if the player has landed
-            if entity.components.position.y >= graphics.getScreenHeight() - 32 then
-                entity.components.position.y = graphics.getScreenHeight() - 32 -- Snap to the ground
-                entity.isJumping = false
-                entity.velocityY = 0                                           -- Reset velocity
-                if entity.fallSound then
-                    entity.fallSound:stop()                                    -- Stop any currently playing sound
-                    entity.fallSound:play()
-                end
-            end
-        end
-
-        -- Sprint logic
-        if love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift") then
-            entity.speed = 300
-        else
-            entity.speed = 100
-        end
-    end
-end)
-
+local startTime  = 0
+local bulbImage
+local buttonsGap = 200
 
 function game_scene.load()
+    -- Clear the terminal
+    ecs.clear()
+
+    io.write("\27[2J\27[H")
+    bulbImage = love.graphics.newImage("assets/bulb.png")
+    -- Load physics, walls, and player
+    physics.load()
+    walls.load()
     player.load()
+
+    -- Load the button image
+    button.load()
+
+    -- Create three buttons at different positions
+    local bottomLocation = love.graphics.getHeight() - 100
+    local middleLocation = love.graphics.getWidth() / 2
+    button.create(middleLocation - buttonsGap, bottomLocation, 50, 50)
+    button.create(middleLocation, bottomLocation, 50, 50)
+    button.create(middleLocation + buttonsGap, bottomLocation, 50, 50)
+
+
+    -- Create a health bar
+    hud.createBar("health", 60, 60, 400, 35, { 0, 1, 0 }, 100) -- Green bar for stamina
+
+
+    hud.createBar("stamina", 60, 110, 400, 35, { 0, 1, 0 }, 100) -- Green bar for stamina
+
+    -- Create a stamina bar
+    -- Initialize start time
     startTime = love.timer.getTime()
-    print("Game scene loaded")
+end
+
+function game_scene.unload()
+    -- Clear walls when unloading the scene
+    walls.clear()
 end
 
 function game_scene.update(dt)
-    -- Add main menu-specific update code here
+    -- Update physics world
+    physics.update(dt)
 
-    ecs.updateSystemsForAllEntities()
-
-    -- Update the position of the wall entity
+    -- Update player
+    player.update(dt)
     ecs.update(dt)
+    local stamina = math.max(0, hud.getBarValue("stamina") - dt * 10)
+    hud.updateBar("stamina", stamina)
+    -- Example: Decrease stamina over time
+    local stamina = math.max(0, hud.getBarValue("stamina") - dt * 10)
+    hud.updateBar("stamina", stamina)
 end
 
 function game_scene.draw()
-    love.graphics.clear(colors.hexToRgb("#FBEED5"))
-    love.graphics.setColor(colors.text)
+    love.graphics.clear(colors.hexToRgb("#0f380f"))
+    love.graphics.setColor(colors.hexToRgb("#9bbc0f"))
+
     -- Calculate elapsed time
     local elapsedTime = love.timer.getTime() - startTime
     local seconds = math.floor(elapsedTime)
     local milliseconds = math.floor((elapsedTime - seconds) * 1000)
 
-    -- Display the timer as seconds:milliseconds
-    render.print(string.format("%02d:%03d", seconds, milliseconds), 70, 40, 32, colors.hexToRgb("#221D1E"),
-        "assets/DepartureMono-Regular.otf")
-    ui.button({ name = "Back", action = "back" }, 70, 80, colors.hexToRgb("#FCD6A6"), function()
-        startTime = 0
-        elapsedTime = 0
-        state.switch("main_menu")
-    end)
 
+    -- Display the timer as seconds:milliseconds
+    render.print(string.format("%02d:%03d", seconds, milliseconds), 60, 150, 32, colors.hexToRgb("#9bbc0f"),
+        "assets/DepartureMono-Regular.otf")
+    ui.button({ name = "Back", action = "back" }, love.graphics.getWidth() - 220, 70, colors.hexToRgb("#9bbc0f"),
+        function()
+            startTime = 0
+            elapsedTime = 0
+            state.switch("main_menu")
+        end)
 
     ecs.draw()
+    -- Draw player
+    player.draw()
+    -- Draw walls
+    walls.draw()
+
+    if bulbImage then
+        local bulbX = (love.graphics.getWidth() - bulbImage:getWidth()) / 4 -- Center horizontally
+        local bulbY = 16 * 3                                                -- Position near the top
+
+        love.graphics.draw(bulbImage, bulbX * 2, bulbY, 0, 4, 4)
+    end
+end
+
+local resizing = false -- Flag to track if resizing is triggered by setMode
+
+function love.resize(w, h)
+    if not physics.world then
+        return
+    end
+    walls.clear()
+    walls.load()
+    game_scene.load()
 end
 
 return game_scene

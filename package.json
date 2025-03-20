@@ -1,0 +1,23 @@
+{
+  "name": "love2d-jam",
+  "version": "1.0.0",
+  "description": "Alex Spinu (zythina)'s entry for Love2D Jam 2025",
+  "homepage": "https://github.com/spinualexandru/love2d-jam-2025#readme",
+  "bugs": {
+    "url": "https://github.com/spinualexandru/love2d-jam-2025/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spinualexandru/love2d-jam-2025.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "gulp": "^5.0.0"
+  }
+}

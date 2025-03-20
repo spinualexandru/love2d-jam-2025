@@ -5,6 +5,7 @@ local events = require('events')
 local state = require('engine.state')
 local graphics = require('engine.graphics')
 local scenes = require('game.scenes')
+local player = require('game.player')
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
@@ -40,4 +41,5 @@ love.keypressed = function(key)
     if key == "escape" then
         state.switch("main_menu")
     end
+    player.keypressed(key)
 end

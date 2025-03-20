@@ -9,7 +9,6 @@ local main_menu = {
             id = "start",
             action = "start",
             action_handler = function()
-                print("I START")
                 state.switch("game")
             end,
             type = "button"
@@ -31,7 +30,6 @@ local main_menu = {
             name = "Exit",
             action = "exit",
             action_handler = function()
-                print("HA")
                 love.event.quit()
             end,
             type = "button"

@@ -24,13 +24,22 @@ local colors = {
     surface0 = { 0.8, 0.816, 0.855 },
     base = { 0.937, 0.945, 0.961 },
     mantle = { 0.902, 0.914, 0.937 },
-    crust = { 0.863, 0.878, 0.91 }
+    crust = { 0.863, 0.878, 0.91 },
+    greens = {
+        -- highlight2 93dc35
+        highlight2 = { 0.549, 0.855, 0.212 }, -- #8fdc35
+        highlight = { 0.607, 0.733, 0.059 },  -- #9bbc0f
+        base = { 0.545, 0.675, 0.059 },       -- #8bac0f
+        shadow = { 0.188, 0.384, 0.188 },     -- #306230
+        border = { 0.059, 0.220, 0.059 }      -- #0f380f
+    },
+    hexToRgb = function(hex)
+        local r = tonumber(hex:sub(2, 3), 16) / 255
+        local g = tonumber(hex:sub(4, 5), 16) / 255
+        local b = tonumber(hex:sub(6, 7), 16) / 255
+        return { r, g, b }
+    end
 }
 
-function colors.hexToRgb(hex)
-    hex = hex:gsub("#", "")
-    
-    return { tonumber(hex:sub(1, 2), 16) / 255, tonumber(hex:sub(3, 4), 16) / 255, tonumber(hex:sub(5, 6), 16) / 255 }
-end
 
 return colors

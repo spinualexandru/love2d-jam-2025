@@ -9,7 +9,7 @@
       "height": 720
     },
     "fullscreen": false,
-    "vsync": false,
+    "vsync": true,
     "fps_cap": 60,
     "fps_counter": true,
     "msaa": 8,

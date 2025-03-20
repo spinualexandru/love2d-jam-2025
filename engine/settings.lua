@@ -1,22 +1,24 @@
 local json = require('libs.json4lua')
 
-local conf = {}
+local conf = {
+    settings = {}
+}
 
 function conf.load()
     encoded_json = love.filesystem.read("settings.json")
-    settings = json.decode(encoded_json)
-    love.window.setMode(settings.display.resolution.width, settings.display.resolution.height, {
-        vsync = settings.display.vsync,
-        fullscreen = settings.display.fullscreen,
+    conf.settings = json.decode(encoded_json)
+    love.window.setMode(conf.settings.display.resolution.width, conf.settings.display.resolution.height, {
+        vsync = conf.settings.display.vsync,
+        fullscreen = conf.settings.display.fullscreen,
         resizable = true,
         minwidth = 800,
         minheight = 600,
         centered = true,
-        msaa = settings.display.msaa,
-        borderless = settings.display.borderless
+        msaa = conf.settings.display.msaa,
+        borderless = conf.settings.display.borderless
     })
 
-    conf.G_PLAYER_NAME = settings.player.name
+    conf.G_PLAYER_NAME = conf.settings.player.name
 end
 
 function conf.loadMetadata()
@@ -27,7 +29,7 @@ end
 function conf.change_setting(setting, value)
     local unparsed_json = love.filesystem.read("settings.json")
     local parsed_settings = json.decode(unparsed_json)
-    print(parsed_settings)
+
     parsed_settings[setting] = value
     local new_settings = json.encode(parsed_settings)
     love.filesystem.write("settings.json", new_settings)
