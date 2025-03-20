@@ -4,13 +4,16 @@ local render     = require('engine.render')
 local colors     = require('engine.colors')
 local graphics   = require('engine.graphics')
 local physics    = require('game.physics')
-local player     = require('game.player')
+
 local walls      = require('game.walls')
+
 local settings   = require('engine.settings')
 local button     = require('game.button')
+
 local ecs        = require('engine.ecs')
 local hud        = require('engine.hud')
-
+local player     = require('game.player')
+local run        = require('game.run')
 local game_scene = {}
 local startTime  = 0
 local bulbImage
@@ -25,10 +28,11 @@ function game_scene.load()
     -- Load physics, walls, and player
     physics.load()
     walls.load()
-    player.load()
+
 
     -- Load the button image
     button.load()
+    run.load()
 
     -- Create three buttons at different positions
     local bottomLocation = love.graphics.getHeight() - 100
@@ -36,13 +40,14 @@ function game_scene.load()
     button.create(middleLocation - buttonsGap, bottomLocation, 50, 50)
     button.create(middleLocation, bottomLocation, 50, 50)
     button.create(middleLocation + buttonsGap, bottomLocation, 50, 50)
-
+    player.load()
 
     -- Create a health bar
     hud.createBar("health", 60, 60, 400, 35, { 0, 1, 0 }, 100) -- Green bar for stamina
 
 
     hud.createBar("stamina", 60, 110, 400, 35, { 0, 1, 0 }, 100) -- Green bar for stamina
+
 
     -- Create a stamina bar
     -- Initialize start time
@@ -59,27 +64,17 @@ function game_scene.update(dt)
     physics.update(dt)
 
     -- Update player
-    player.update(dt)
     ecs.update(dt)
-    local stamina = math.max(0, hud.getBarValue("stamina") - dt * 10)
-    hud.updateBar("stamina", stamina)
-    -- Example: Decrease stamina over time
-    local stamina = math.max(0, hud.getBarValue("stamina") - dt * 10)
-    hud.updateBar("stamina", stamina)
+    hud.updateBar("stamina", player.getStamina())
 end
 
 function game_scene.draw()
     love.graphics.clear(colors.hexToRgb("#0f380f"))
     love.graphics.setColor(colors.hexToRgb("#9bbc0f"))
 
-    -- Calculate elapsed time
-    local elapsedTime = love.timer.getTime() - startTime
-    local seconds = math.floor(elapsedTime)
-    local milliseconds = math.floor((elapsedTime - seconds) * 1000)
-
 
     -- Display the timer as seconds:milliseconds
-    render.print(string.format("%02d:%03d", seconds, milliseconds), 60, 150, 32, colors.hexToRgb("#9bbc0f"),
+    render.print(run.getFormattedTime(), 60, 150, 32, colors.hexToRgb("#9bbc0f"),
         "assets/DepartureMono-Regular.otf")
     ui.button({ name = "End", action = "back" }, love.graphics.getWidth() - 170, 55, colors.hexToRgb("#9bbc0f"),
         function()
@@ -89,8 +84,6 @@ function game_scene.draw()
         end)
 
     ecs.draw()
-    -- Draw player
-    player.draw()
     -- Draw walls
     walls.draw()
 

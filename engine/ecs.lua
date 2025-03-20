@@ -44,6 +44,7 @@ function ecs.removeEntity(entity)
 end
 
 function ecs.removeAllEntitiesOfType(type)
+    print("Removing all entities of type:", type)
     for i = #ecs.entities, 1, -1 do
         if ecs.entities[i].type == type then
             table.remove(ecs.entities, i)

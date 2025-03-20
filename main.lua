@@ -41,5 +41,4 @@ love.keypressed = function(key)
     if key == "escape" then
         state.switch("main_menu")
     end
-    player.keypressed(key)
 end

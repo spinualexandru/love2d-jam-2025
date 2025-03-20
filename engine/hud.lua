@@ -18,17 +18,18 @@ end
 
 -- Function to update a bar's value
 function hud.updateBar(name, value)
-    local entities = ecs.getEntitiesByComponent("name")
+    local entities = ecs.getEntitiesByType("hud_bar")
     for _, entity in ipairs(entities) do
         if entity.components.name == name then
-            entity.components.value = math.max(0, math.min(value, entity.components.maxValue)) -- Clamp value
+            entity.components.value = value
+            return
         end
     end
 end
 
 -- Function to get a bar's value
 function hud.getBarValue(name)
-    local entities = ecs.getEntitiesByComponent("name")
+    local entities = ecs.getEntitiesByType("hud_bar")
     for _, entity in ipairs(entities) do
         if entity.components.name == name then
             return entity.components.value
@@ -38,6 +39,7 @@ function hud.getBarValue(name)
 end
 
 function hud.announcement(text, x, y)
+    ecs.removeAllEntitiesOfType("announcement") -- Remove all previous announcements
     if not x or not y then
         x = love.graphics.getWidth() / 2
         y = love.graphics.getHeight() / 2
@@ -74,6 +76,7 @@ end
 -- ECS system to update the announcement timer
 -- ECS system to update the announcement timer
 ecs.createSystem("announcementUpdate", { "timer", "color" }, function(dt, entity)
+    if entity.components.type ~= "announcement" then return end -- Skip if not an announcement
     -- Decrease the timer
     entity.components.timer = entity.components.timer - dt
 
@@ -83,12 +86,13 @@ ecs.createSystem("announcementUpdate", { "timer", "color" }, function(dt, entity
         color[4] = math.max(0, entity.components.timer / 3) -- Fade out over 3 seconds
     else
         -- Remove the entity when the timer reaches zero
-        ecs.removeEntity(entity)
+        ecs.removeAllEntitiesOfType("announcement")
     end
 end, "update")
 
 
 ecs.createSystem("achievementUpdate", { "timer", "color" }, function(dt, entity)
+    if entity.components.type ~= "achievement" then return end -- Skip if not an achievement
     -- Decrease the timer
     entity.components.timer = entity.components.timer - dt
 
@@ -98,12 +102,13 @@ ecs.createSystem("achievementUpdate", { "timer", "color" }, function(dt, entity)
         color[4] = math.max(0, entity.components.timer / 3) -- Fade out over 3 seconds
     else
         -- Remove the entity when the timer reaches zero
-        ecs.removeEntity(entity)
+        ecs.removeAllEntitiesOfType("achievement")
     end
 end, "update")
 -- ECS system to render the announcement
 
 ecs.createSystem("announcementRender", { "position", "size", "text", "color", "type" }, function(entity)
+    -- Check if the entity is an announcement
     if entity.components.type ~= "announcement" then return end -- Skip if not an announcement
 
     love.graphics.setFont(love.graphics.newFont("assets/DepartureMono-Regular.otf", 24))

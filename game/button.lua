@@ -2,9 +2,9 @@ local ecs = require('engine.ecs')
 local debug = require('libs.debug')
 local mathPlus = require('engine.math')
 local hud = require('engine.hud')
-
+local player = require('game.player') -- Import the player module
 local button = {}
-local buttonImage -- Declare the button image variable
+local buttonImage                     -- Declare the button image variable
 
 -- Load the button image
 function button.load()
@@ -46,6 +46,10 @@ function button.create(x, y, width, height)
 end
 
 ecs.createSystem("buttonRender", { "position", "size", "state" }, function(entity)
+    -- Check if the entity is a button
+    if entity.type ~= "button" then return end    -- Skip if not a button
+    local oldColor = { love.graphics.getColor() } -- Save the old color
+    love.graphics.setColor(1, 1, 1)               -- Set color to white
     local x, y = entity.components.position.x, entity.components.position.y
     local width, height = entity.components.size.width, entity.components.size.height
 
@@ -57,14 +61,17 @@ ecs.createSystem("buttonRender", { "position", "size", "state" }, function(entit
         -- Fallback: Draw a rectangle if the image is not loaded
         love.graphics.setColor(1, 0, 0) -- Red color
         love.graphics.rectangle("fill", x, y, width, height)
-        love.graphics.setColor(1, 1, 1) -- Reset color
     end
+
+    love.graphics.setColor(oldColor)
 end, "render")
 
 
 ecs.createSystem("buttonInteraction", { "position", "size", "state" }, function(dt, entity)
-    local player = require('game.player') -- Import the player module
-    local px, py = player.getPosition()   -- Get the player's position
+    -- Check if the entity is a button
+    if entity.type ~= "button" then return end -- Skip if not a button
+
+    local px, py = player.getPosition()        -- Get the player's position
     local bx, by = entity.components.position.x, entity.components.position.y
     local bw, bh = entity.components.size.width, entity.components.size.height
 
