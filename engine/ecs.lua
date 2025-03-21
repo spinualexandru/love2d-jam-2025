@@ -10,9 +10,10 @@ local ecs = {
 -- Entities
 
 function ecs.createEntity(type, components)
+    local id = math.random(1, 1000000)
     local entity = {
         type = type,
-        id = #ecs.entities + 1,
+        id = id,
         components = {}
     }
     for key, value in pairs(components) do
@@ -38,13 +39,25 @@ function ecs.removeEntity(entity)
     for i, e in ipairs(ecs.entities) do
         if e.id == entity.id then
             table.remove(ecs.entities, i)
+            print("Entity removed: " .. entity.type) -- Debug statement
             break
+        end
+    end
+
+    -- Remove the entity from any systems that might be using it
+    for _, system in ipairs(ecs.systems) do
+        if system.entities then
+            for j, systemEntity in ipairs(system.entities) do
+                if systemEntity.id == entity.id then
+                    table.remove(system.entities, j)
+                    break
+                end
+            end
         end
     end
 end
 
 function ecs.removeAllEntitiesOfType(type)
-    print("Removing all entities of type:", type)
     for i = #ecs.entities, 1, -1 do
         if ecs.entities[i].type == type then
             table.remove(ecs.entities, i)
@@ -63,16 +76,12 @@ function ecs.getComponent(name)
 end
 
 function ecs.addComponent(entity, name, data)
-    -- check if the component already exists, if not create it the nadd
-    print("Adding component:", name, "to entity:", entity.id)
     if ecs.components[name] == nil then
         ecs.createComponent(name, data)
     end
 
     if entity.components[name] == nil then
         entity.components[name] = data
-    else
-        print("Component already exists for entity:", entity.id, "Component:", name)
     end
 end
 
@@ -181,7 +190,8 @@ function ecs.ensureEntityTypesHaveSystem(entityTypes, systemName)
             end
         end
         if not hasSystem then
-            ecs.createSystem(systemName, {}, function() end, entityType)
+            ecs.createSystem(systemName, {}, function()
+            end, entityType)
         end
     end
 end
@@ -296,6 +306,18 @@ function ecs.updateSystemsForAllEntities(dt)
     end
 end
 
+function ecs.processKeyPress(key, scancode, isRepeat)
+    for _, entity in ipairs(ecs.entities) do
+        local systems = ecs.getSystemsByEntity(entity)
+
+        for _, system in ipairs(systems) do
+            if system.type == "input" then
+                system.callback(key, scancode, isRepeat, entity)
+            end
+        end
+    end
+end
+
 function ecs.getSystemsByEntity(entity)
     local systems = {}
     for _, system in ipairs(ecs.systems) do
@@ -319,6 +341,10 @@ end
 
 function ecs.draw()
     ecs.drawSystemsForAllEntities()
+end
+
+function ecs.keypressed(key, scancode, isRepeat)
+    ecs.processKeyPress(key, scancode, isRepeat)
 end
 
 return ecs

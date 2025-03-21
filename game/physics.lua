@@ -8,7 +8,7 @@ function physics.load()
     -- Initialize the physics world with gravity
     physics.world = lovePhysics.newWorld(0, 500, true) -- Gravity set to 500 in the y-axis
     physics.world:setCallbacks(physics.beginContact, physics.endContact)
-    physics.world:setCallbacks(require('game.player').beginContact)
+    physics.world:setCallbacks(require('game.player').beginContact, require('game.player').endContact)
 end
 
 function physics.update(dt)

@@ -9,7 +9,6 @@ local buttonImage                     -- Declare the button image variable
 -- Load the button image
 function button.load()
     buttonImage = love.graphics.newImage("assets/button-round.png")
-    print("Button image loaded:", buttonImage)
 end
 
 function button.create(x, y, width, height)
@@ -31,9 +30,7 @@ function button.create(x, y, width, height)
             pressed = false,
             action = function()
                 ecs.removeAllEntitiesOfType("announcement") -- Remove all previous announcements
-                -- print random number
 
-                print("Button pressed at:", math.random(1, 100))
                 hud.announcement("Button  pressed now " .. math.random(1, 100))
                 hud.achievement("Clicked a button")
             end
@@ -91,8 +88,6 @@ ecs.createSystem("buttonInteraction", { "position", "size", "state" }, function(
         -- Call the button action
         if not entity.components.state.pressed then
             entity.components.state.pressed = true
-
-            print("Button" .. entity.id .. " pressed")
             local action = entity.components.state.action
             if action then
                 action()

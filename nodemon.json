@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/refs/heads/master/src/schemas/json/nodemon.json",
   "watch": [
     "main.lua",
     "globals.lua",
@@ -12,6 +13,8 @@
     "shaders",
     "settings.json"
   ],
+  "cwd": ".",
+  "colours": true,
   "quiet": true,
   "ext": "lua",
   "exec": "DEV_MODE=true love .",

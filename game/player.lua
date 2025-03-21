@@ -3,7 +3,11 @@ local graphics = require('engine.graphics')
 local ecs = require('engine.ecs')
 local hud = require('engine.hud')
 
-local player = {}
+local player = {
+    keyboard = {
+        currentKeyPressed = nil,
+    }
+}
 
 function player.load()
     -- Ensure physics.world is initialized
@@ -24,7 +28,7 @@ function player.load()
         },
         jumpCount = 0,
         image = love.graphics.newImage("assets/player.png"),
-        damping = 5,    -- Linear damping to reduce sliding
+        damping = 5, -- Linear damping to reduce sliding
         friction = 0.8, -- Friction to reduce sliding on surfaces
         stamina = {
             max = 100,
@@ -39,13 +43,18 @@ function player.load()
             isRegenerating = false
         },
         dash = {
-            cooldown = 1,         -- Cooldown time in seconds
+            cooldown = 1, -- Cooldown time in seconds
             staminaCost = 33.3333 -- Stamina cost for dashing
         },
         points = {
             current = 0,
             multiplier = 1,
-        }
+        },
+        scale = {
+            x = 2,
+            y = 2
+        },
+        rotation = 0 -- Add rotation component
     })
 
     -- Initialize the player's physics components
@@ -93,6 +102,21 @@ function player.setHealth(value)
     end
 end
 
+function player.getPoints()
+    local playerEntity = ecs.getEntitiesByType("player")[1]
+    if playerEntity then
+        return playerEntity.components.points.current
+    end
+    return 0
+end
+
+function player.addPoints(value)
+    local playerEntity = ecs.getEntitiesByType("player")[1]
+    if playerEntity then
+        playerEntity.components.points.current = playerEntity.components.points.current + value * playerEntity.components.points.multiplier
+    end
+end
+
 ecs.createSystem("playerMovement", { "position", "velocity", "direction", "physics", "jumpCount" }, function(dt, entity)
     if entity.type ~= "player" then
         return
@@ -111,46 +135,60 @@ ecs.createSystem("playerMovement", { "position", "velocity", "direction", "physi
         body:setX(math.min(body:getX() + 200 * dt, graphics.getScreenWidth() - 32 * 3))
         entity.components.direction = 1
     end
-
-    -- Jumping
-    if love.keyboard.isDown("space") and entity.components.jumpCount < 2 then
-        body:applyLinearImpulse(0, -500)
-        entity.components.jumpCount = entity.components.jumpCount + 1
-    end
 end, "update")
 
-ecs.createSystem("playerDash", { "physics", "direction", "dash", "stamina" }, function(dt, entity)
+ecs.createSystem("playerJump", { "physics", "jumpCount", "scale", "rotation" }, function(key, scancode, isRepeat, entity)
     if entity.type ~= "player" then
         return
     end
     local physics = entity.components.physics
     local body = physics.body
-    local direction = entity.components.direction
+    local scale = entity.components.scale
+
+    if key == "space" and entity.components.jumpCount < 2 then
+        if entity.components.jumpCount == 0 then
+            -- First jump
+            body:applyLinearImpulse(0, -1000)
+        else
+            if entity.components.jumpCount == 1 then
+                -- Second jump (double jump)
+                body:applyLinearImpulse(0, -1000)
+                entity.components.rotation = 0 -- Reset rotation
+                entity.components.isFlipping = true -- Start flipping
+            end
+        end
+
+        -- Apply bounce effect
+        scale.x = 1.8
+        scale.y = 2.2
+        print("Key pressed for jump")
+
+        love.audio.play(love.audio.newSource("assets/fall.wav", "static"))
+        entity.components.jumpCount = entity.components.jumpCount + 1
+    end
+end, "input")
+
+ecs.createSystem("playerDash", { "physics", "direction", "dash", "stamina" }, function(key, scancode, isRepeat, entity)
+    if entity.type ~= "player" then
+        return
+    end
+    local physics = entity.components.physics
+    local body = physics.body
     local dash = entity.components.dash
     local stamina = entity.components.stamina
 
-    -- Reduce the cooldown timer
-    if dash.cooldown > 0 then
-        entity.components.dash.cooldown = math.max(0, dash.cooldown - dt)
-    end
-
-    -- Check if the dash key is pressed and the cooldown is over
-    if love.keyboard.isDown("lshift") and dash.cooldown == 0 then
-        if (stamina.current > dash.staminaCost) then
-            -- Apply a dash force
-
-            local vx, vy = body:getLinearVelocity()
-            body:setLinearVelocity(vx + (400 * direction), vy)
-            -- Decrease stamina and set the cooldown
-            player.setStamina(stamina.current - 33.3333) -- Decrease stamina by 10
-
-            entity.components.dash.cooldown = 1
+    if key == "lshift" and not isRepeat then
+        if stamina.current >= dash.staminaCost then
+            dashCooldown = 1
+            local dashImpulse = 1000 * entity.components.direction
+            body:applyLinearImpulse(dashImpulse, 0)
+            stamina.current = stamina.current - dash.staminaCost
+            love.audio.play(love.audio.newSource("assets/fall.wav", "static"))
         else
-            hud.announcement("Not enough stamina", love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
-            entity.components.dash.cooldown = 1
+            hud.announcement("Not enough stamina to dash!", love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
         end
     end
-end, "update")
+end, "input")
 
 ecs.createSystem("playerStaminaRegen", { "stamina" }, function(dt, entity)
     if entity.type ~= "player" then
@@ -171,7 +209,7 @@ function player.getPosition()
     return nil, nil
 end
 
-ecs.createSystem("playerRender", { "position", "size", "direction", "image", "physics" }, function(entity)
+ecs.createSystem("playerRender", { "position", "size", "direction", "image", "physics", "scale", "rotation" }, function(entity)
     if entity.type ~= "player" then
         return
     end
@@ -180,19 +218,55 @@ ecs.createSystem("playerRender", { "position", "size", "direction", "image", "ph
     local body = physics.body
     local image = entity.components.image
     local direction = entity.components.direction
+    local scale = entity.components.scale
+    local rotation = entity.components.rotation
 
-    -- Draw the player image centered on the player's position
+    -- Adjust scale based on vertical velocity
+    local vy = body:getLinearVelocity()
+    if vy < 0 then
+        -- Narrower and taller when jumping
+        scale.x = 1.6
+        scale.y = 2.2
+    elseif vy > 0 then
+        -- Wider and less tall when falling
+        scale.x = 2.2
+        scale.y = 1.8
+    end
+
+    if entity.components.isFlipping then
+        entity.components.rotation = entity.components.rotation + (math.pi * 3.5 * love.timer.getDelta())
+        if entity.components.rotation >= math.pi * 2 then
+            entity.components.rotation = 0
+            entity.components.isFlipping = false -- Stop flipping
+        end
+    end
+
+    -- Draw the player image centered on the player's position with rotation
     local px, py = body:getPosition()
-    love.graphics.draw(image, px, py, 0, 2 * direction, 2, image:getWidth() / 2, image:getHeight() / 2)
+    love.graphics.draw(image, px, py, rotation, scale.x * direction, scale.y, image:getWidth() / 2, image:getHeight() / 2)
+
 end, "render")
 
 function player.beginContact(a, b, coll)
     local userDataA = a:getUserData()
     local userDataB = b:getUserData()
 
-    -- Reset jump count if the player lands
+    -- Reset jump count and scale if the player lands
     if userDataA == "player" or userDataB == "player" then
         local playerEntity = ecs.getEntitiesByType("player")[1]
+        playerEntity.components.jumpCount = 0
+        playerEntity.components.scale.x = 2
+        playerEntity.components.scale.y = 2
+    end
+end
+
+function player.endContact(a, b, coll)
+    -- Logic for when objects stop colliding (if needed)
+end
+
+function player.resetJumpCount()
+    local playerEntity = ecs.getEntitiesByType("player")[1]
+    if playerEntity then
         playerEntity.components.jumpCount = 0
     end
 end

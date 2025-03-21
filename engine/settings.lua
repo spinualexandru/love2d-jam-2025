@@ -10,9 +10,9 @@ function conf.load()
     love.window.setMode(conf.settings.display.resolution.width, conf.settings.display.resolution.height, {
         vsync = conf.settings.display.vsync,
         fullscreen = conf.settings.display.fullscreen,
-        resizable = true,
-        minwidth = 800,
-        minheight = 600,
+        resizable = false,
+        minwidth = 1280,
+        minheight = 720,
         centered = true,
         msaa = conf.settings.display.msaa,
         borderless = conf.settings.display.borderless

@@ -1,0 +1,22 @@
+{
+    "Lua.diagnostics.globals": [
+        "love"
+    ],
+    "Lua.workspace.library": [
+        "${addons}/love2d/module/library",
+        "${addons}/garrysmod/module/library"
+    ],
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.runtime.special": {
+        "love.filesystem.load": "loadfile",
+        "include": "dofile",
+        "IncludeCS": "dofile"
+    },
+    "Lua.workspace.checkThirdParty": false,
+    "Lua.runtime.nonstandardSymbol": [
+        "continue"
+    ],
+    "Lua.diagnostics.disable": [
+        "duplicate-set-field"
+    ]
+}
