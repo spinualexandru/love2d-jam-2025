@@ -28,6 +28,7 @@ function run.load()
     })
     hud.announcement("Phase 1", love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
 end
+
 function run.setTime(entity)
     if entity.type ~= "run" or entity.components.isPaused then
         return
@@ -88,19 +89,17 @@ function run.setIsPaused(isPaused)
         runEntity.components.pauseStartTime = love.timer.getTime()
     else
         if runEntity.components.pauseStartTime then
-            runEntity.components.totalPausedTime = runEntity.components.totalPausedTime + (love.timer.getTime() - runEntity.components.pauseStartTime)
+            runEntity.components.totalPausedTime = runEntity.components.totalPausedTime +
+                (love.timer.getTime() - runEntity.components.pauseStartTime)
             runEntity.components.pauseStartTime = nil
         end
     end
-    print("Game is paused: " .. tostring(isPaused))
 end
 
 function shouldPhaseChange()
     local runEntity = ecs.getEntitiesByType("run")[1]
     return runEntity.components.time > runEntity.components.phase.baseDuration * runEntity.components.phase.current
 end
-
---create input system to pause the game when Esc is pressed
 
 ecs.createSystem("pauseGame", { "isPaused", "type" }, function(key)
     if key == 'p' then

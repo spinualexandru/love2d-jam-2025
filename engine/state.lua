@@ -31,6 +31,7 @@ function state.draw()
 end
 
 function state.load()
+    state.switch("main_menu")
     for name, state in pairs(states) do
         if state.load then
             state.load()

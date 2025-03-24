@@ -7,7 +7,7 @@ local ecs = {
 }
 
 
--- Entities
+
 
 function ecs.createEntity(type, components)
     local id = math.random(1, 1000000)
@@ -39,12 +39,9 @@ function ecs.removeEntity(entity)
     for i, e in ipairs(ecs.entities) do
         if e.id == entity.id then
             table.remove(ecs.entities, i)
-            print("Entity removed: " .. entity.type) -- Debug statement
             break
         end
     end
-
-    -- Remove the entity from any systems that might be using it
     for _, system in ipairs(ecs.systems) do
         if system.entities then
             for j, systemEntity in ipairs(system.entities) do
@@ -64,8 +61,6 @@ function ecs.removeAllEntitiesOfType(type)
         end
     end
 end
-
--- Components
 
 function ecs.createComponent(name, data)
     ecs.components[name] = data
@@ -157,8 +152,6 @@ function ecs.getEntitiesByComponents(components)
     end
     return entities
 end
-
---Systems
 
 function ecs.createSystem(name, components, callback, type)
     local system = {
@@ -282,8 +275,6 @@ function ecs.drawSystemsForAllEntities()
         for _, system in ipairs(systems) do
             if system.type == "render" then
                 system.callback(entity)
-
-                -- Restore the previous color
                 love.graphics.setColor({ 1, 1, 1 })
             end
         end
@@ -297,9 +288,9 @@ function ecs.updateSystemsForAllEntities(dt)
         for _, system in ipairs(systems) do
             if system.type == "update" then
                 if (entity) then
-                    system.callback(dt, entity) -- Pass both dt and entity
+                    system.callback(dt, entity)
                 else
-                    system.callback(dt)         -- Pass both dt and entity
+                    system.callback(dt)
                 end
             end
         end

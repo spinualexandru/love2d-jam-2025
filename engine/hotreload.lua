@@ -9,7 +9,6 @@ local function reloadModule(name)
 end
 
 local function isDevMode()
-    -- get env var
     local env_var = os.getenv("DEV_MODE")
 
     if (env_var) then
@@ -46,7 +45,7 @@ end
 function hotreload.draw()
     G_ScreenHeight = love.graphics.getHeight()
     if isDevMode() then
-        love.graphics.draw(hotreload_icon, 10, G_ScreenHeight - hotreload_icon:getHeight() - 10) -- Adjust the y-coordinate for the image
+        love.graphics.draw(hotreload_icon, 10, G_ScreenHeight - hotreload_icon:getHeight() - 10)
         render.print("Dev Mode, Press 'r' to reload", 10 + hotreload_icon:getWidth() + 10,
             G_ScreenHeight - hotreload_icon:getHeight() - 5, 12, { 0, 0, 0 })
     end

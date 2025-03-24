@@ -13,18 +13,12 @@ local main_menu = {
             end,
             type = "button"
         },
-        {
-            id = "load_game",
-            name = "Load Game",
-            opens = "load_game",
-            type = "button"
-        },
-        {
-            id = "options",
-            name = "Options",
-            opens = "options",
-            type = "button"
-        },
+
+
+
+
+
+
         {
             id = "exit",
             name = "Exit",

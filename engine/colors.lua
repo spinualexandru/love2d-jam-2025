@@ -26,12 +26,12 @@ local colors = {
     mantle = { 0.902, 0.914, 0.937 },
     crust = { 0.863, 0.878, 0.91 },
     greens = {
-        -- highlight2 93dc35
-        highlight2 = { 0.549, 0.855, 0.212 }, -- #8fdc35
-        highlight = { 0.607, 0.733, 0.059 },  -- #9bbc0f
-        base = { 0.545, 0.675, 0.059 },       -- #8bac0f
-        shadow = { 0.188, 0.384, 0.188 },     -- #306230
-        border = { 0.059, 0.220, 0.059 }      -- #0f380f
+
+        highlight2 = { 0.549, 0.855, 0.212 },
+        highlight = { 0.607, 0.733, 0.059 },
+        base = { 0.545, 0.675, 0.059 },
+        shadow = { 0.188, 0.384, 0.188 },
+        border = { 0.059, 0.220, 0.059 }
     },
     hexToRgb = function(hex)
         local r = tonumber(hex:sub(2, 3), 16) / 255

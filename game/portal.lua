@@ -51,7 +51,7 @@ ecs.createSystem("portalShoot", { "position" }, function(dt, entity)
         end
     end
 
-    -- destroy the energy ball if it's in the range of one of the buttons
+
     local energyBalls = ecs.getEntitiesByType("energy_ball")
     for _, energyBallEntity in ipairs(energyBalls) do
         local energyBallX = energyBallEntity.components.position.x
@@ -63,20 +63,17 @@ ecs.createSystem("portalShoot", { "position" }, function(dt, entity)
             local buttonWidth = buttonEntity.components.size.width
             local buttonHeight = buttonEntity.components.size.height
             if mathPlus.aabbCollision(energyBallX, energyBallY, 10, 10, buttonX, buttonY, buttonWidth, buttonHeight) then
-                -- Check if the player is in range of the energy ball
                 local playerEntity = ecs.getEntitiesByType("player")[1]
                 local playerX, playerY = player.getPosition()
 
-                -- Calculate the distance between the energy ball and the player
+
                 local distance = mathPlus.distance(energyBallX, energyBallY, playerX, playerY)
-                local threshold = 50 -- Define a threshold distance for the collision
+                local threshold = 50
 
                 if distance <= threshold then
                     player.addPoints(1)
-                    print("Player points: " .. player.getPoints())
                 else
                     player.setHealth(player.getHealth() - 10)
-                    print("Player health: " .. player.getHealth())
                 end
 
                 ecs.removeEntity(energyBallEntity)

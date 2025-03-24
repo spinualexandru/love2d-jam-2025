@@ -91,11 +91,11 @@ function ui.checkbox(item, x, y, color, action)
 end
 
 function ui.slider(item, x, y, color, action, min, max, value)
-    --TODO
+
 end
 
 function ui.dropdown(item, x, y, color, action, options)
-    --TODO
+
 end
 
 function ui.textbox(item, x, y, prompt, placeholder, color, action)
@@ -124,7 +124,7 @@ function ui.textbox(item, x, y, prompt, placeholder, color, action)
     love.graphics.rectangle("fill", x, y + 6, width + string.len(item.name) * 12, text_size - 5, 0)
     love.graphics.setColor(colors.hexToRgb("#FFA07A"))
 
-    -- blink bar next to the text
+
     if (love.timer.getTime() % 1) > 0.5 then
         love.graphics.rectangle("fill", x + string.len(text) * 18, y + 10, 5, 30, 0)
     end
@@ -146,6 +146,7 @@ end
 
 function ui.draw()
     local interface = ui.current_interface or ui_interfaces.interfaces.main_menu
+
     for i, item in ipairs(interface.items) do
         if item.type == "button" then
             ui.button(item, 10, (graphics.getScreenHeight() / 7) + i * 55, colors.hexToRgb("#FCD6A6"), function()

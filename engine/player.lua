@@ -9,20 +9,18 @@ local player = {
     speed = 100,
     image = nil,
     isJumping = false,
-    velocityY = 0,  -- Vertical velocity
-    gravity = 1000, -- Gravity strength
+    velocityY = 0,
+    gravity = 1000,
     jumpStrength = -300,
     fallSound = love.audio.newSource("assets/fall.wav", "static")
 }
 
 function player.load()
-    print("Player loaded")
     player.x = 100
     player.y = love.graphics.getHeight() - player.height
 end
 
 function player.update(dt)
-    -- Horizontal movement
     if love.keyboard.isDown("left") or love.keyboard.isDown("a") then
         if player.x > 32 then
             player.x = player.x - player.speed * dt
@@ -38,7 +36,7 @@ function player.update(dt)
         end
     end
 
-    -- Jump logic
+
     if not player.isJumping then
         if love.keyboard.isDown("space") then
             player.isJumping = true
@@ -52,7 +50,7 @@ function player.update(dt)
         player.speed = 100
     end
 
-    -- Apply gravity if jumping
+
     if player.isJumping then
         player.velocityY = player.velocityY + player.gravity * dt
         player.y = player.y + player.velocityY * dt
@@ -62,7 +60,7 @@ function player.update(dt)
             player.isJumping = false
             player.velocityY = 0
             if player.fallSound then
-                player.fallSound:stop() -- Stop any currently playing sound
+                player.fallSound:stop()
                 player.fallSound:play()
             end
         end

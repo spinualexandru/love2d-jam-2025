@@ -10,17 +10,16 @@ local player = {
 }
 
 function player.load()
-    -- Ensure physics.world is initialized
     if not physics.world then
         error("Physics world is not initialized. Call physics.load() before player.load().")
     end
 
-    -- Create the player entity
+
     ecs.createEntity("player", {
         position = { x = 16 * 3, y = graphics.getScreenHeight() - 60 * 3 },
         size = { width = 32, height = 50 },
         velocity = { x = 0, y = 0 },
-        direction = 1, -- 1 for right, -1 for left
+        direction = 1,
         physics = {
             body = love.physics.newBody(physics.world, 16 * 3, graphics.getScreenHeight() - 60 * 3, "dynamic"),
             shape = love.physics.newRectangleShape(32, 50),
@@ -28,8 +27,8 @@ function player.load()
         },
         jumpCount = 0,
         image = love.graphics.newImage("assets/player.png"),
-        damping = 5, -- Linear damping to reduce sliding
-        friction = 0.8, -- Friction to reduce sliding on surfaces
+        damping = 5,
+        friction = 0.8,
         stamina = {
             max = 100,
             current = 100,
@@ -43,8 +42,8 @@ function player.load()
             isRegenerating = false
         },
         dash = {
-            cooldown = 1, -- Cooldown time in seconds
-            staminaCost = 33.3333 -- Stamina cost for dashing
+            cooldown = 1,
+            staminaCost = 33.3333
         },
         points = {
             current = 0,
@@ -54,10 +53,10 @@ function player.load()
             x = 2,
             y = 2
         },
-        rotation = 0 -- Add rotation component
+        rotation = 0
     })
 
-    -- Initialize the player's physics components
+
     local playerEntity = ecs.getEntitiesByType("player")[1]
     local physics = playerEntity.components.physics
     physics.body:setFixedRotation(true)
@@ -68,7 +67,6 @@ function player.load()
 end
 
 function player.unload()
-    -- Clear the player entity
     ecs.removeAllEntitiesOfType("player")
 end
 
@@ -113,7 +111,8 @@ end
 function player.addPoints(value)
     local playerEntity = ecs.getEntitiesByType("player")[1]
     if playerEntity then
-        playerEntity.components.points.current = playerEntity.components.points.current + value * playerEntity.components.points.multiplier
+        playerEntity.components.points.current = playerEntity.components.points.current +
+            value * playerEntity.components.points.multiplier
     end
 end
 
@@ -124,9 +123,9 @@ ecs.createSystem("playerMovement", { "position", "velocity", "direction", "physi
     local physics = entity.components.physics
     local body = physics.body
     local velocity = entity.components.velocity
-    -- set gravity
+
     body:setGravityScale(3)
-    -- Horizontal movement
+
     if love.keyboard.isDown("left") or love.keyboard.isDown("a") then
         body:setX(math.max(body:getX() - 200 * dt, 26 * 3))
         entity.components.direction = -1
@@ -147,21 +146,18 @@ ecs.createSystem("playerJump", { "physics", "jumpCount", "scale", "rotation" }, 
 
     if key == "space" and entity.components.jumpCount < 2 then
         if entity.components.jumpCount == 0 then
-            -- First jump
             body:applyLinearImpulse(0, -1000)
         else
             if entity.components.jumpCount == 1 then
-                -- Second jump (double jump)
                 body:applyLinearImpulse(0, -1000)
-                entity.components.rotation = 0 -- Reset rotation
-                entity.components.isFlipping = true -- Start flipping
+                entity.components.rotation = 0
+                entity.components.isFlipping = true
             end
         end
 
-        -- Apply bounce effect
+
         scale.x = 1.8
         scale.y = 2.2
-        print("Key pressed for jump")
 
         love.audio.play(love.audio.newSource("assets/fall.wav", "static"))
         entity.components.jumpCount = entity.components.jumpCount + 1
@@ -209,49 +205,48 @@ function player.getPosition()
     return nil, nil
 end
 
-ecs.createSystem("playerRender", { "position", "size", "direction", "image", "physics", "scale", "rotation" }, function(entity)
-    if entity.type ~= "player" then
-        return
-    end
-    love.graphics.setColor(1, 1, 1) -- Reset color to white
-    local physics = entity.components.physics
-    local body = physics.body
-    local image = entity.components.image
-    local direction = entity.components.direction
-    local scale = entity.components.scale
-    local rotation = entity.components.rotation
-
-    -- Adjust scale based on vertical velocity
-    local vy = body:getLinearVelocity()
-    if vy < 0 then
-        -- Narrower and taller when jumping
-        scale.x = 1.6
-        scale.y = 2.2
-    elseif vy > 0 then
-        -- Wider and less tall when falling
-        scale.x = 2.2
-        scale.y = 1.8
-    end
-
-    if entity.components.isFlipping then
-        entity.components.rotation = entity.components.rotation + (math.pi * 3.5 * love.timer.getDelta())
-        if entity.components.rotation >= math.pi * 2 then
-            entity.components.rotation = 0
-            entity.components.isFlipping = false -- Stop flipping
+ecs.createSystem("playerRender", { "position", "size", "direction", "image", "physics", "scale", "rotation" },
+    function(entity)
+        if entity.type ~= "player" then
+            return
         end
-    end
+        love.graphics.setColor(1, 1, 1)
+        local physics = entity.components.physics
+        local body = physics.body
+        local image = entity.components.image
+        local direction = entity.components.direction
+        local scale = entity.components.scale
+        local rotation = entity.components.rotation
 
-    -- Draw the player image centered on the player's position with rotation
-    local px, py = body:getPosition()
-    love.graphics.draw(image, px, py, rotation, scale.x * direction, scale.y, image:getWidth() / 2, image:getHeight() / 2)
 
-end, "render")
+        local vy = body:getLinearVelocity()
+        if vy < 0 then
+            scale.x = 1.6
+            scale.y = 2.2
+        elseif vy > 0 then
+            scale.x = 2.2
+            scale.y = 1.8
+        end
+
+        if entity.components.isFlipping then
+            entity.components.rotation = entity.components.rotation + (math.pi * 3.5 * love.timer.getDelta())
+            if entity.components.rotation >= math.pi * 2 then
+                entity.components.rotation = 0
+                entity.components.isFlipping = false
+            end
+        end
+
+
+        local px, py = body:getPosition()
+        love.graphics.draw(image, px, py, rotation, scale.x * direction, scale.y, image:getWidth() / 2,
+            image:getHeight() / 2)
+    end, "render")
 
 function player.beginContact(a, b, coll)
     local userDataA = a:getUserData()
     local userDataB = b:getUserData()
 
-    -- Reset jump count and scale if the player lands
+
     if userDataA == "player" or userDataB == "player" then
         local playerEntity = ecs.getEntitiesByType("player")[1]
         playerEntity.components.jumpCount = 0
@@ -261,7 +256,7 @@ function player.beginContact(a, b, coll)
 end
 
 function player.endContact(a, b, coll)
-    -- Logic for when objects stop colliding (if needed)
+
 end
 
 function player.resetJumpCount()
